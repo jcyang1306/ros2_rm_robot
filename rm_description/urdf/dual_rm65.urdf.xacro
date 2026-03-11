@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot name="dual_rm65" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- 定义参数：允许从外部传入 link6_type，默认值 Link6 -->
+  <xacro:arg name="link6_type" default="Link6" />
+
+  <!-- 可选：如果想让左右臂使用不同的 link6_type，可以再定义两个参数 -->
+  <!-- <xacro:arg name="left_link6_type"  default="$(arg link6_type)" /> -->
+  <!-- <xacro:arg name="right_link6_type" default="$(arg link6_type)" /> -->
+
+  <!-- 包含宏文件 -->
+  <xacro:include filename="rm65_arm_macro.xacro" />
+  
+
+  <!-- 推荐：添加一个 world 链接作为整个机器人的根 -->
+  <link name="world" />
+
+  <!-- 左臂：通过 fixed joint 固定到 world -->
+  <joint name="left_base_joint" type="fixed">
+    <origin xyz="0  0.175 0" rpy="0 0 ${pi/2}" />  <!-- 左右间隔可根据实际安装调整，例如 0.6m -->
+    <parent link="world" />
+    <child  link="left_base_link" />
+  </joint>
+
+  <!-- 实例化左臂宏 -->
+  <xacro:rm65_arm prefix="left_"
+                  link6_type="$(arg link6_type)" />
+
+  <!-- 右臂：类似 -->
+  <joint name="right_base_joint" type="fixed">
+    <origin xyz="0 -0.175 0" rpy="0 0 -${pi/2}" />
+    <parent link="world" />
+    <child  link="right_base_link" />
+  </joint>
+
+  <!-- 实例化右臂宏 -->
+  <xacro:rm65_arm prefix="right_"
+                  link6_type="$(arg link6_type)" />
+
+</robot>
