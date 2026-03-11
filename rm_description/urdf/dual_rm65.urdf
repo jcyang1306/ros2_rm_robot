@@ -41,7 +41,7 @@
   </link>
   <!-- joint1 连接到这个独立的 base_link -->
   <joint name="left_joint1" type="revolute">
-    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <origin rpy="0 0 0" xyz="0 0 0.2405"/>
     <parent link="left_base_link"/>
     <child link="left_Link1"/>
     <axis xyz="0 0 1"/>
@@ -250,7 +250,7 @@
   </link>
   <!-- joint1 连接到这个独立的 base_link -->
   <joint name="right_joint1" type="revolute">
-    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <origin rpy="0 0 0" xyz="0 0 0.2405"/>
     <parent link="right_base_link"/>
     <child link="right_Link1"/>
     <axis xyz="0 0 1"/>
