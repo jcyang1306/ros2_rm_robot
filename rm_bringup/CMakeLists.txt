@@ -16,6 +16,12 @@ install(
   DESTINATION share/${PROJECT_NAME}
 )
 
+install(
+  PROGRAMS dual_arm_bringup/standalone_dual_arm_adapter.py
+  DESTINATION lib/${PROJECT_NAME}
+  RENAME standalone_dual_arm_adapter
+)
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights
