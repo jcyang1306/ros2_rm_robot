@@ -33,6 +33,9 @@ public:
 
 private:
     rm_ros_interfaces::msg::Jointpos joint_msg;
+
+    std::string namespace_;
+    
     // rm_ros_interfaces::msg::Jointpos75 joint7_msg;
     int arm_type_ = 75;
     bool follow_ = false;
