@@ -57,12 +57,6 @@ def generate_launch_description():
                 description="Remap trajectory execution action",
             ),
             Node(
-                package="rm_bringup",
-                executable="standalone_dual_arm_adapter",
-                name="standalone_dual_arm_adapter",
-                output="screen",
-            ),
-            Node(
                 package="moveit_ros_move_group",
                 executable="move_group",
                 output="screen",

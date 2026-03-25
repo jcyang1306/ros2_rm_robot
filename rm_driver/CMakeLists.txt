@@ -43,19 +43,21 @@ if(BUILD_TESTING)
 endif()
 add_executable(rm_driver src/rm_driver.cpp)
 
+add_executable(fake_rm_driver src/fake_rm_driver.cpp)
+ament_target_dependencies(fake_rm_driver rclcpp sensor_msgs rm_ros_interfaces)
 
 set(RM_STATIC_LIBRARY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
  
 # link_directories(${catkin_LIB_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/lib/RM_Service)
 link_directories(${RM_STATIC_LIBRARY})
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(rm_driver
   ${PROJECT_SOURCE_DIR}/lib/libapi_cpp.so
 )
 
 ament_target_dependencies(rm_driver rclcpp std_msgs sensor_msgs rm_ros_interfaces)
 
-install(TARGETS  rm_driver  DESTINATION lib/${PROJECT_NAME})
+install(TARGETS rm_driver fake_rm_driver DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY launch config
   DESTINATION share/${PROJECT_NAME})
