@@ -156,7 +156,7 @@ class StandaloneDualArmAdapter:
     async def _execute_trajectory_goal(self, goal_handle: ServerGoalHandle):
         trajectory = goal_handle.request.trajectory
         result = FollowJointTrajectory.Result()
-        success = self._dispatch_split_trajectory(trajectory)
+        success = await self._dispatch_split_trajectory(trajectory)
         if success and rclpy.ok():
             result.error_code = FollowJointTrajectory.Result.SUCCESSFUL
             goal_handle.succeed()
@@ -198,7 +198,7 @@ class StandaloneDualArmAdapter:
 
         return left_traj, right_traj
 
-    def _dispatch_split_trajectory(self, trajectory: JointTrajectory) -> bool:
+    async def _dispatch_split_trajectory(self, trajectory: JointTrajectory) -> bool:
         left_traj, right_traj = self._split_trajectory(trajectory)
 
         left_goal = FollowJointTrajectory.Goal()
@@ -217,18 +217,15 @@ class StandaloneDualArmAdapter:
             return False
 
         t0 = time.time()
-        left_future = self._left_client.send_goal_async(left_goal)
-        right_future = self._right_client.send_goal_async(right_goal)
+        # Kick off both sends before awaiting either — the arm controllers then
+        # execute in parallel. asyncio.gather cannot be used here because rclpy's
+        # MultiThreadedExecutor runs callbacks in a plain ThreadPoolExecutor that
+        # has no asyncio event loop; rclpy Futures are awaitable directly instead.
+        left_send_fut = self._left_client.send_goal_async(left_goal)
+        right_send_fut = self._right_client.send_goal_async(right_goal)
+        left_handle = await left_send_fut
+        right_handle = await right_send_fut
 
-        rclpy.spin_until_future_complete(
-            self._node, left_future, executor=self._executor, timeout_sec=10.0
-        )
-        rclpy.spin_until_future_complete(
-            self._node, right_future, executor=self._executor, timeout_sec=10.0
-        )
-
-        left_handle = left_future.result()
-        right_handle = right_future.result()
         if left_handle is None or right_handle is None:
             self._logger.error("Goal send timed out or failed")
             return False
@@ -238,15 +235,9 @@ class StandaloneDualArmAdapter:
 
         left_res_fut = left_handle.get_result_async()
         right_res_fut = right_handle.get_result_async()
-        rclpy.spin_until_future_complete(
-            self._node, left_res_fut, executor=self._executor, timeout_sec=30.0
-        )
-        rclpy.spin_until_future_complete(
-            self._node, right_res_fut, executor=self._executor, timeout_sec=30.0
-        )
+        left_res = await left_res_fut
+        right_res = await right_res_fut
 
-        left_res = left_res_fut.result()
-        right_res = right_res_fut.result()
         if left_res is None or right_res is None:
             self._logger.error("Result wait timed out")
             return False
