@@ -3,7 +3,7 @@ from launch_ros.actions import Node
 def generate_launch_description():
 
     # TODO: fix hardcoded namespaces, passing as launch argument
-    namespaces = ['left_arm', 'right_arm']
+    namespaces = ['left_arm_controller', 'right_arm_controller']
     node_names = ['left_control', 'right_control']
     node_to_launch = [
         Node(
@@ -13,7 +13,7 @@ def generate_launch_description():
             namespace=arm_namespace,
             parameters=[
                 {'arm_type': 65},
-                {'follow': False}
+                {'follow': False},
             ],
             output='screen'
         ) for arm_namespace, node_name in zip(namespaces, node_names)

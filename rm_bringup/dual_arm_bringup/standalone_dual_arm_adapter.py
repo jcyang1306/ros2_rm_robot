@@ -23,8 +23,9 @@ from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 class StandaloneDualArmAdapter:
     """
     Handles action ``dual_arm_controller/follow_joint_trajectory``, splits trajectories
-    to left and right ``rm_group_controller`` actions, and publishes combined
-    ``JointState`` from ``left_arm/joint_states`` and ``right_arm/joint_states``.
+    to left and right ``left_arm_controller`` and ``right_arm_controller`` actions, and publishes combined
+    ``JointState`` from ``left_arm_controller/joint_states`` and ``right_arm_controller/joint_states``.
+    arm_prefix format: left_arm_controller, right_arm_controller, dual_arm_controller
     """
 
     def __init__(
@@ -35,10 +36,10 @@ class StandaloneDualArmAdapter:
         joint_names: Optional[List[str]] = None,
         follow_joint_trajectory_action: str = "dual_arm_controller/follow_joint_trajectory",
         joint_states_topic: str = "/joint_states",
-        left_arm_action: str = "/left_arm/rm_group_controller/follow_joint_trajectory",
-        right_arm_action: str = "/right_arm/rm_group_controller/follow_joint_trajectory",
-        left_joint_states_topic: str = "left_arm/joint_states",
-        right_joint_states_topic: str = "right_arm/joint_states",
+        left_arm_action: str = "/left_arm_controller/follow_joint_trajectory",
+        right_arm_action: str = "/right_arm_controller/follow_joint_trajectory",
+        left_joint_states_topic: str = "left_arm_controller/joint_states",
+        right_joint_states_topic: str = "right_arm_controller/joint_states",
         joint_state_publish_period_sec: float = 0.1,
         dof: int = 12,
         left_dof: int = 6,
