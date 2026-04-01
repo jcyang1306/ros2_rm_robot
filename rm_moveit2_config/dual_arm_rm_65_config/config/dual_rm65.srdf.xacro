@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SRDF for dual RM65 with pluggable gripper support.
+  This file is processed by xacro; pass  gripper:=<name>  to include
+  the matching set of disable_collisions entries automatically.
+
+  Supported values for  gripper
+    robotiq_2f85   (default) Robotiq 2F-85 static gripper
+    none           Bare flange – no gripper
+
+  The  disable_gripper_collisions  macro below generates all necessary
+  allowed-collision pairs for one gripper instance.  To add support for
+  a new gripper, add a matching macro and a new <xacro:if> block at the
+  bottom of this file.
+-->
+<robot name="dual_rm65" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:arg name="gripper" default="robotiq_2f85" />
+    <xacro:property name="gripper_type" value="$(arg gripper)" />
+
+    <!-- ══════════════════════════════════════════════════════════════
+         GRIPPER COLLISION MACRO
+         params:
+           arm_link6  – arm flange link the gripper is mounted to
+                        (e.g. "left_Link6")
+           p          – gripper link-name prefix (e.g. "left_gripper_")
+         ══════════════════════════════════════════════════════════════ -->
+    <xacro:macro name="disable_robotiq_2f85_collisions" params="arm_link6 p">
+
+        <!-- ── arm flange ↔ gripper base (mount joint) ─────────────── -->
+        <disable_collisions link1="${arm_link6}"              link2="${p}robotiq_85_base_link"    reason="Adjacent"/>
+
+        <!-- ── gripper base ↔ all four knuckles ────────────────────── -->
+        <disable_collisions link1="${p}robotiq_85_base_link"  link2="${p}left_outer_knuckle"      reason="Adjacent"/>
+        <disable_collisions link1="${p}robotiq_85_base_link"  link2="${p}left_inner_knuckle"      reason="Adjacent"/>
+        <disable_collisions link1="${p}robotiq_85_base_link"  link2="${p}right_inner_knuckle"     reason="Adjacent"/>
+        <disable_collisions link1="${p}robotiq_85_base_link"  link2="${p}right_outer_knuckle"     reason="Adjacent"/>
+
+        <!-- ── knuckle ↔ finger (each chain) ───────────────────────── -->
+        <disable_collisions link1="${p}left_outer_knuckle"    link2="${p}left_outer_finger"       reason="Adjacent"/>
+        <disable_collisions link1="${p}left_inner_knuckle"    link2="${p}left_inner_finger"       reason="Adjacent"/>
+        <disable_collisions link1="${p}right_inner_knuckle"   link2="${p}right_inner_finger"      reason="Adjacent"/>
+        <disable_collisions link1="${p}right_outer_knuckle"   link2="${p}right_outer_finger"      reason="Adjacent"/>
+
+        <!-- ── finger ↔ opposing finger (touching in static pose) ──── -->
+        <disable_collisions link1="${p}left_inner_finger"     link2="${p}left_outer_finger"       reason="Default"/>
+        <disable_collisions link1="${p}right_inner_finger"    link2="${p}right_outer_finger"      reason="Default"/>
+
+        <!-- ── knuckle ↔ opposing knuckle (close proximity) ────────── -->
+        <disable_collisions link1="${p}left_inner_knuckle"    link2="${p}left_outer_knuckle"      reason="Default"/>
+        <disable_collisions link1="${p}right_inner_knuckle"   link2="${p}right_outer_knuckle"     reason="Default"/>
+
+        <!-- ── cross-chain near pairs ──────────────────────────────── -->
+        <disable_collisions link1="${p}left_inner_knuckle"    link2="${p}left_outer_finger"       reason="Never"/>
+        <disable_collisions link1="${p}left_outer_knuckle"    link2="${p}left_inner_finger"       reason="Never"/>
+        <disable_collisions link1="${p}right_inner_knuckle"   link2="${p}right_outer_finger"      reason="Never"/>
+        <disable_collisions link1="${p}right_outer_knuckle"   link2="${p}right_inner_finger"      reason="Never"/>
+
+        <!-- ── arm flange vs. near gripper links ───────────────────── -->
+        <disable_collisions link1="${arm_link6}"              link2="${p}left_outer_knuckle"      reason="Never"/>
+        <disable_collisions link1="${arm_link6}"              link2="${p}right_outer_knuckle"     reason="Never"/>
+        <disable_collisions link1="${arm_link6}"              link2="${p}left_inner_knuckle"      reason="Never"/>
+        <disable_collisions link1="${arm_link6}"              link2="${p}right_inner_knuckle"     reason="Never"/>
+
+    </xacro:macro>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         PLANNING GROUPS
+         ══════════════════════════════════════════════════════════════ -->
+    <group name="left_arm">
+        <chain base_link="left_base_link" tip_link="left_Link6"/>
+    </group>
+    <group name="right_arm">
+        <chain base_link="right_base_link" tip_link="right_Link6"/>
+    </group>
+    <group name="dual_arm">
+        <group name="left_arm"/>
+        <group name="right_arm"/>
+    </group>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         GROUP STATES
+         ══════════════════════════════════════════════════════════════ -->
+    <group_state name="init_pose" group="dual_arm">
+        <joint name="left_joint1"  value="0"/>
+        <joint name="left_joint2"  value="0"/>
+        <joint name="left_joint3"  value="0"/>
+        <joint name="left_joint4"  value="0"/>
+        <joint name="left_joint5"  value="-0.015"/>
+        <joint name="left_joint6"  value="0"/>
+        <joint name="right_joint1" value="0"/>
+        <joint name="right_joint2" value="0"/>
+        <joint name="right_joint3" value="0"/>
+        <joint name="right_joint4" value="0"/>
+        <joint name="right_joint5" value="0"/>
+        <joint name="right_joint6" value="0"/>
+    </group_state>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         ARM SELF-COLLISION PAIRS  (always present regardless of gripper)
+         ══════════════════════════════════════════════════════════════ -->
+    <disable_collisions link1="left_Link1"    link2="left_Link2"    reason="Adjacent"/>
+    <disable_collisions link1="left_Link1"    link2="left_Link3"    reason="Never"/>
+    <disable_collisions link1="left_Link1"    link2="left_Link4"    reason="Never"/>
+    <disable_collisions link1="left_Link1"    link2="left_base_link" reason="Adjacent"/>
+    <disable_collisions link1="left_Link1"    link2="right_Link1"   reason="Never"/>
+    <disable_collisions link1="left_Link1"    link2="right_Link2"   reason="Never"/>
+    <disable_collisions link1="left_Link1"    link2="right_Link3"   reason="Never"/>
+    <disable_collisions link1="left_Link1"    link2="right_Link4"   reason="Never"/>
+    <disable_collisions link1="left_Link1"    link2="right_base_link" reason="Never"/>
+    <disable_collisions link1="left_Link2"    link2="left_Link3"    reason="Adjacent"/>
+    <disable_collisions link1="left_Link2"    link2="left_Link4"    reason="Never"/>
+    <disable_collisions link1="left_Link2"    link2="left_base_link" reason="Default"/>
+    <disable_collisions link1="left_Link2"    link2="right_Link1"   reason="Never"/>
+    <disable_collisions link1="left_Link2"    link2="right_Link2"   reason="Never"/>
+    <disable_collisions link1="left_Link2"    link2="right_base_link" reason="Never"/>
+    <disable_collisions link1="left_Link3"    link2="left_Link4"    reason="Adjacent"/>
+    <disable_collisions link1="left_Link3"    link2="left_Link5"    reason="Never"/>
+    <disable_collisions link1="left_Link3"    link2="left_Link6"    reason="Never"/>
+    <disable_collisions link1="left_Link3"    link2="left_base_link" reason="Never"/>
+    <disable_collisions link1="left_Link3"    link2="right_Link1"   reason="Never"/>
+    <disable_collisions link1="left_Link3"    link2="right_base_link" reason="Never"/>
+    <disable_collisions link1="left_Link4"    link2="left_Link5"    reason="Adjacent"/>
+    <disable_collisions link1="left_Link4"    link2="left_Link6"    reason="Never"/>
+    <disable_collisions link1="left_Link4"    link2="right_Link1"   reason="Never"/>
+    <disable_collisions link1="left_Link4"    link2="right_base_link" reason="Never"/>
+    <disable_collisions link1="left_Link5"    link2="left_Link6"    reason="Adjacent"/>
+    <disable_collisions link1="left_base_link" link2="right_Link1"  reason="Never"/>
+    <disable_collisions link1="left_base_link" link2="right_Link2"  reason="Never"/>
+    <disable_collisions link1="left_base_link" link2="right_Link3"  reason="Never"/>
+    <disable_collisions link1="left_base_link" link2="right_Link4"  reason="Never"/>
+    <disable_collisions link1="left_base_link" link2="right_base_link" reason="Adjacent"/>
+    <disable_collisions link1="right_Link1"   link2="right_Link2"   reason="Adjacent"/>
+    <disable_collisions link1="right_Link1"   link2="right_Link3"   reason="Never"/>
+    <disable_collisions link1="right_Link1"   link2="right_Link4"   reason="Never"/>
+    <disable_collisions link1="right_Link1"   link2="right_base_link" reason="Adjacent"/>
+    <disable_collisions link1="right_Link2"   link2="right_Link3"   reason="Adjacent"/>
+    <disable_collisions link1="right_Link2"   link2="right_Link4"   reason="Never"/>
+    <disable_collisions link1="right_Link2"   link2="right_base_link" reason="Default"/>
+    <disable_collisions link1="right_Link3"   link2="right_Link4"   reason="Adjacent"/>
+    <disable_collisions link1="right_Link3"   link2="right_Link5"   reason="Never"/>
+    <disable_collisions link1="right_Link3"   link2="right_Link6"   reason="Never"/>
+    <disable_collisions link1="right_Link3"   link2="right_base_link" reason="Never"/>
+    <disable_collisions link1="right_Link4"   link2="right_Link5"   reason="Adjacent"/>
+    <disable_collisions link1="right_Link4"   link2="right_Link6"   reason="Never"/>
+    <disable_collisions link1="right_Link5"   link2="right_Link6"   reason="Adjacent"/>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         GRIPPER COLLISION PAIRS  (conditional on gripper type)
+         Add a new <xacro:if> block here when adding a new gripper.
+         ══════════════════════════════════════════════════════════════ -->
+
+    <xacro:if value="${gripper_type == 'robotiq_2f85'}">
+        <xacro:disable_robotiq_2f85_collisions arm_link6="left_Link6"  p="left_gripper_" />
+        <xacro:disable_robotiq_2f85_collisions arm_link6="right_Link6" p="right_gripper_" />
+    </xacro:if>
+
+    <!-- Future example:
+    <xacro:if value="${gripper_type == 'my_gripper'}">
+        <xacro:disable_my_gripper_collisions arm_link6="left_Link6"  p="left_gripper_" />
+        <xacro:disable_my_gripper_collisions arm_link6="right_Link6" p="right_gripper_" />
+    </xacro:if>
+    -->
+
+</robot>

@@ -7,8 +7,21 @@
 
     <!-- Import control_xacro -->
     <xacro:include filename="dual_rm65.ros2_control.xacro" />
-
-
     <xacro:dual_rm65_ros2_control name="FakeSystem" initial_positions_file="$(arg initial_positions_file)"/>
+
+    <!-- Gripper macro definitions -->
+    <xacro:include filename="$(find robotiq_2f85_description)/robots/robotiq_2f85_gripper.xacro" />
+
+    <!-- robotiq_2f85 -->
+    <xacro:robotiq_2f85_gripper
+            prefix="left_gripper_"
+            parent="left_Link6"
+            xyz="0 0 0"
+            rpy="0 0 0" />
+    <xacro:robotiq_2f85_gripper
+        prefix="right_gripper_"
+        parent="right_Link6"
+        xyz="0 0 0"
+        rpy="0 0 -${pi/6}" />
 
 </robot>

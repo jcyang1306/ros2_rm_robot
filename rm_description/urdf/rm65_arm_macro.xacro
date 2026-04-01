@@ -29,7 +29,7 @@
 
     <!-- joint1 连接到这个独立的 base_link -->
     <joint name="${prefix}joint1" type="revolute">
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="0 0 0.2405" rpy="0 0 0"/>
       <parent link="${prefix}base_link"/>
       <child link="${prefix}Link1"/>
       <axis xyz="0 0 1"/>
