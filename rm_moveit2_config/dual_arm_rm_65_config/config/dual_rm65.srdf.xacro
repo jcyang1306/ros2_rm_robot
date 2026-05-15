@@ -17,6 +17,8 @@
 
     <xacro:arg name="gripper" default="robotiq_2f85" />
     <xacro:property name="gripper_type" value="$(arg gripper)" />
+    <xacro:property name="left_tip_link" value="${'left_gripper_tcp' if gripper_type == 'robotiq_2f85' else 'left_Link6'}" />
+    <xacro:property name="right_tip_link" value="${'right_gripper_tcp' if gripper_type == 'robotiq_2f85' else 'right_Link6'}" />
 
     <!-- ══════════════════════════════════════════════════════════════
          GRIPPER COLLISION MACRO
@@ -68,10 +70,10 @@
          PLANNING GROUPS
          ══════════════════════════════════════════════════════════════ -->
     <group name="left_arm">
-        <chain base_link="left_base_link" tip_link="left_Link6"/>
+        <chain base_link="left_base_link" tip_link="${left_tip_link}"/>
     </group>
     <group name="right_arm">
-        <chain base_link="right_base_link" tip_link="right_Link6"/>
+        <chain base_link="right_base_link" tip_link="${right_tip_link}"/>
     </group>
     <group name="dual_arm">
         <group name="left_arm"/>

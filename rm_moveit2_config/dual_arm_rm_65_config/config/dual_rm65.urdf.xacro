@@ -3,7 +3,7 @@
     <xacro:arg name="initial_positions_file" default="initial_positions.yaml" />
 
     <!-- Import dual_rm65 urdf file -->
-    <xacro:include filename="$(find rm_description)/urdf/dual_rm65.urdf" />
+    <xacro:include filename="$(find rm_description)/urdf/dual_rm65.urdf.xacro" />
 
     <!-- Import control_xacro -->
     <xacro:include filename="dual_rm65.ros2_control.xacro" />
@@ -17,11 +17,15 @@
             prefix="left_gripper_"
             parent="left_Link6"
             xyz="0 0 0"
-            rpy="0 0 0" />
+            rpy="0 0 -${pi/4}" 
+            tcp_xyz="0 0 0.17"
+            tcp_rpy="0 0 0" />
     <xacro:robotiq_2f85_gripper
         prefix="right_gripper_"
         parent="right_Link6"
         xyz="0 0 0"
-        rpy="0 0 -${pi/6}" />
+        rpy="0 0 ${pi*5/12}" 
+        tcp_xyz="0 0 0.17"
+        tcp_rpy="0 0 0" />
 
 </robot>
