@@ -50,6 +50,24 @@ ros2 launch rm_bringup dual_rm_65_moveit.launch.py launch_rviz:=true
 
 ---
 
+## Gripper launch
+
+The `rm_gripper` package provides a launch file that starts the Modbus gripper node and lets you choose which gripper implementation to run, make sure rm_driver is running before launching the rm_gripper.
+
+```bash
+ros2 launch rm_gripper rm_gripper.launch.py gripper_type:=robotiq
+```
+
+```bash
+ros2 launch rm_gripper rm_gripper.launch.py gripper_type:=hitbot
+```
+
+`gripper_type` accepts:
+- `robotiq` (default)
+- `hitbot`
+
+---
+
 ## Launch arguments
 
 ### `dual_rm_65_hw_bringup.launch.py`
