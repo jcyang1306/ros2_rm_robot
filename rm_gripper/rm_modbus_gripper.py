@@ -265,7 +265,7 @@ class RobotiqGripper(RMModbusGripper):
         time.sleep(0.5)
         return True
 
-    def open(self, position: float = 80, speed: float = 50, force: float = 50) -> bool:
+    def open(self, position: float = 100, speed: float = 50, force: float = 50) -> bool:
         self._validate_params(position, speed, force)
         pos_val = int((100 - position) / 100.0 * 255)
         speed_val = int(speed / 100.0 * 255)

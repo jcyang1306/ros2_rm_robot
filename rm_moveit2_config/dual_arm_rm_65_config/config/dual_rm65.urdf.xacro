@@ -17,15 +17,15 @@
             prefix="left_gripper_"
             parent="left_Link6"
             xyz="0 0 0"
-            rpy="0 0 -${pi/4}" 
+            rpy="0 0 ${pi*5/12}" 
             tcp_xyz="0 0 0.17"
-            tcp_rpy="0 0 0" />
+            tcp_rpy="0 0 ${-pi/2}" />
     <xacro:robotiq_2f85_gripper
         prefix="right_gripper_"
         parent="right_Link6"
         xyz="0 0 0"
         rpy="0 0 ${pi*5/12}" 
-        tcp_xyz="0 0 0.17"
-        tcp_rpy="0 0 0" />
+        tcp_xyz="0 0 0.19"
+        tcp_rpy="0 0 ${-pi/2}" />
 
 </robot>
